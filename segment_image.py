@@ -47,6 +47,7 @@ class SegmentGenerator:
         xmin = 0
         ymin = 0
         padding = 0
+        print 'Input Shape: ', image.shape
 
         # Get the objectness
         heat_map = self.heatmap_obj.get_map(image)
@@ -84,14 +85,15 @@ class SegmentGenerator:
         ymax_tight = int(ymin + y + h + padding) if int(y + h + padding) < map_h else ymin + map_h
 
         # self._display_images(patches)
-        self._display_images(heat_map)
+        print 'Output Shape: ', heat_map.shape
+        self._display_image(heat_map)
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000876.jpg'
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000925.jpg'
 
     sg = SegmentGenerator(dest_path)
     sg.segment(image_path)
