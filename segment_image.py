@@ -2,7 +2,6 @@ import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import xml.etree.ElementTree as ET
 from lib.map import HeatMap
 
 
@@ -85,14 +84,14 @@ class SegmentGenerator:
         ymax_tight = int(ymin + y + h + padding) if int(y + h + padding) < map_h else ymin + map_h
 
         # self._display_images(patches)
-        # self._display_images(heatmaps)
+        self._display_images(heat_map)
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = ''
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000876.png'
 
     sg = SegmentGenerator(dest_path)
     sg.segment(image_path)
