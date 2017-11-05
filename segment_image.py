@@ -91,7 +91,7 @@ if __name__ == '__main__':
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000876.png'
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000876.jpg'
 
     sg = SegmentGenerator(dest_path)
     sg.segment(image_path)
