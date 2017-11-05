@@ -35,7 +35,7 @@ class HeatMap:
 
     def get_map(self, image, verbose=False):
 
-        image = scipy.misc.imresize(image, 8.0, interp='bicubic')
+        # image = scipy.misc.imresize(image, 8.0, interp='bicubic')
         image_shape = image.shape
 
         # Image Pre-processing
