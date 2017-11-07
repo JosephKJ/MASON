@@ -172,9 +172,16 @@ if __name__ == '__main__':
 
     e = Enhancer(img_db_path, annotation_path, dest_annotation_path, actual_segmentation_annotation_path)
 
-    image_names = ["2007_001423", "2007_001397", "2007_001289"]
-    for image in image_names:
-        e.enhance(image)
-        print 'Processing ', image
+    len = len(os.listdir(actual_segmentation_annotation_path))
+    for i, annotation_file in enumerate(os.listdir(actual_segmentation_annotation_path)):
+        if os.path.isfile(os.path.join(actual_segmentation_annotation_path, annotation_file)):
+            image = annotation_file.split('.')[0]
+            print 'Processing ', image, ' (', i, ' of ', len, ')'
+            e.enhance(image)
+
+    # image_names = ["2007_001423", "2007_001397", "2007_001289"]
+    # for image in image_names:
+    #     e.enhance(image)
+    #     print 'Processing ', image
 
     print('Done.')
