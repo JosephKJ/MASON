@@ -55,7 +55,7 @@ class GC_executor:
         return img
 
 class Enhancer:
-    def __init__(self, path_to_images, path_to_annotations, path_to_enhanced_annotations, img_file_extension='jpg'):
+    def __init__(self, path_to_images, path_to_annotations, path_to_enhanced_annotations, actual_segmentation_annotation_path, img_file_extension='jpg'):
 
         self.heatmap_obj = HeatMap()
 
@@ -63,6 +63,7 @@ class Enhancer:
         self.annotation_path = path_to_annotations
         self.dest_annotation_path = path_to_enhanced_annotations
         self.img_file_extension = img_file_extension
+        self.actual_segmentation_annotation_path = actual_segmentation_annotation_path
         self._validate_paths()
 
     def _validate_paths(self):
@@ -81,9 +82,8 @@ class Enhancer:
         plt.show()
 
     def _display_images(self, images):
-        plt.figure()
-        # plt.figure(figsize=(20, 10))
-        columns = 2
+        plt.figure(figsize=(20, 10))
+        columns = 5
         for i, image in enumerate(images):
             plt.subplot(len(images) / columns + 1, columns, i + 1)
             frame = plt.gca()
@@ -91,6 +91,17 @@ class Enhancer:
             frame.axes.get_yaxis().set_ticks([])
             plt.imshow(image)
         plt.show()
+
+    def _save_images(self, images, name):
+        plt.figure(figsize=(20, 10))
+        columns = 5
+        for i, image in enumerate(images):
+            plt.subplot(len(images) / columns + 1, columns, i + 1)
+            frame = plt.gca()
+            frame.axes.get_xaxis().set_ticks([])
+            frame.axes.get_yaxis().set_ticks([])
+            plt.imshow(image)
+        plt.savefig(name, bbox_inches='tight')
 
     def enhance(self, file_name, only_gc=True):
         gc = GC_executor()
@@ -132,15 +143,22 @@ class Enhancer:
 
         # Save the image
         img = gc.grab_cut_with_patch(np.copy(image), np.copy(combined_heat_map))
+        img_gc_only = gc.grab_cut_without_patch(np.copy(image))
+
+        gc_results.append(image)
+        # gc_results.append(cv2.applyColorMap(np.uint8(-combined_heat_map), cv2.COLORMAP_JET))
+        gc_results.append(combined_heat_map)
         gc_results.append(img)
-        img = gc.grab_cut_without_patch(np.copy(image))
-        gc_results.append(img)
+        gc_results.append(img_gc_only)
+        annotation_image = cv2.imread(os.path.join(self.actual_segmentation_annotation_path, file_name + '.png'), cv2.IMREAD_COLOR)
+        gc_results.append(annotation_image)
 
         # Visualize the output
         # self._display_images(patches)
         # self._display_images(heatmaps)
         # self._display_images(gc_without_objectness)
-        self._display_images(gc_results)
+        # self._display_images(gc_results)
+        self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
         # self._display_image(combined_heat_map)
 
 
@@ -149,10 +167,14 @@ if __name__ == '__main__':
 
     img_db_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/')
     annotation_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/Annotations/')
-    dest_annotation_path = os.path.join('./data/enhanced_annotations')
+    dest_annotation_path = os.path.join('/home/joseph/segmentation_results')
+    actual_segmentation_annotation_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/')
 
-    # img_name = "2007_001416" # Sheep
-    img_name = "2007_001299" #cows
+    e = Enhancer(img_db_path, annotation_path, dest_annotation_path, actual_segmentation_annotation_path)
 
-    e = Enhancer(img_db_path, annotation_path, dest_annotation_path)
-    e.enhance(img_name)
+    image_names = ["2007_001423", "2007_001397", "2007_001289"]
+    for image in image_names:
+        e.enhance(image)
+        print 'Processing ', image
+
+    print('Done.')
