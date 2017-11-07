@@ -12,7 +12,7 @@ caffe_root = os.path.join(os.path.dirname(__file__), '..', '..', 'caffe')
 
 class HeatMap:
     def __init__(self, arch='VGG16'):
-        caffe.set_device(1)
+        caffe.set_device(0)
         caffe.set_mode_gpu()
         # caffe.set_mode_cpu()
 
