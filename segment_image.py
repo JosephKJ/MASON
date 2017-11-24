@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from lib.map import HeatMap
-
+from lib.gc_executor import GC_executor
 
 class SegmentGenerator:
     def __init__(self, destination_folder, img_file_extension='jpg'):
@@ -30,7 +30,7 @@ class SegmentGenerator:
     def _display_images(self, images):
         plt.figure()
         # plt.figure(figsize=(20, 10))
-        columns = 2
+        columns = 4
         for i, image in enumerate(images):
             plt.subplot(len(images) / columns + 1, columns, i + 1)
             frame = plt.gca()
@@ -38,6 +38,17 @@ class SegmentGenerator:
             frame.axes.get_yaxis().set_ticks([])
             plt.imshow(image)
         plt.show()
+
+    def _save_images(self, images, name):
+        plt.figure(figsize=(20, 10))
+        columns = 5
+        for i, image in enumerate(images):
+            plt.subplot(len(images) / columns + 1, columns, i + 1)
+            frame = plt.gca()
+            frame.axes.get_xaxis().set_ticks([])
+            frame.axes.get_yaxis().set_ticks([])
+            plt.imshow(image)
+        plt.savefig(name, bbox_inches='tight')
 
     def segment(self, img_path):
 
@@ -58,27 +69,27 @@ class SegmentGenerator:
         # self._display_image(heat_map)
         # print heat_map
         objectness_heatmap = cv2.applyColorMap(np.uint8(-heat_map), cv2.COLORMAP_JET)
-        display_images.append(objectness_heatmap)
+        display_images.append(cv2.cvtColor(objectness_heatmap, cv2.COLOR_BGR2RGB))
         # self._display_image(objectness_heatmap)
 
 
         # Remove the border in the detections
-        border = 2
-        temp = np.zeros_like(heat_map)
-        temp[border:-border, border:-border] = heat_map[border:-border, border:-border]
-        heat_map = temp
-
-        # Binary Map
-        heat_map[heat_map > 0] = 1
-        map_h, map_w = heat_map.shape
-
-        # Flood filling it
-        im_floodfill = heat_map.copy()
-        h, w = im_floodfill.shape[:2]
-        mask = np.zeros((h + 2, w + 2), np.uint8)
-        cv2.floodFill(im_floodfill, mask, (0, 0), 255)
-        im_floodfill_inv = cv2.bitwise_not(im_floodfill)
-        heat_map = heat_map | im_floodfill_inv
+        # border = 2
+        # temp = np.zeros_like(heat_map)
+        # temp[border:-border, border:-border] = heat_map[border:-border, border:-border]
+        # heat_map = temp
+        #
+        # # Binary Map
+        # heat_map[heat_map > 0] = 1
+        # map_h, map_w = heat_map.shape
+        #
+        # # Flood filling it
+        # im_floodfill = heat_map.copy()
+        # h, w = im_floodfill.shape[:2]
+        # mask = np.zeros((h + 2, w + 2), np.uint8)
+        # cv2.floodFill(im_floodfill, mask, (0, 0), 255)
+        # im_floodfill_inv = cv2.bitwise_not(im_floodfill)
+        # heat_map = heat_map | im_floodfill_inv
 
         # # Rejecting again if the number of disconnected components are > 3
         # im2, contours, hierarchy = cv2.findContours(heat_map, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -94,46 +105,56 @@ class SegmentGenerator:
         # ymax_tight = int(ymin + y + h + padding) if int(y + h + padding) < map_h else ymin + map_h
 
         # self._display_images(patches)
-        mask = heat_map
-        mask[mask == 255] = 3
-        mask[mask == 0] = 2
+        # mask = heat_map
+        # mask[mask == 255] = 3
+        # mask[mask == 0] = 2
 
-        # # changes: START
-        bgdModel = np.zeros((1, 65), np.float64)
-        fgdModel = np.zeros((1, 65), np.float64)
-        mask_onlyGC = np.zeros(image.shape[:2], np.uint8)
-        rect = (0, 0, image.shape[1]-1, image.shape[0]-1)
-        cv2.grabCut(image, mask_onlyGC, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
-        mask_onlyGC = np.where((mask_onlyGC == 2) | (mask_onlyGC == 0), 0, 1).astype('uint8')
-        img = image * mask_onlyGC[:, :, np.newaxis]
+        # # # changes: START
+        # bgdModel = np.zeros((1, 65), np.float64)
+        # fgdModel = np.zeros((1, 65), np.float64)
+        # mask_onlyGC = np.zeros(image.shape[:2], np.uint8)
+        # rect = (0, 0, image.shape[1]-1, image.shape[0]-1)
+        # cv2.grabCut(image, mask_onlyGC, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
+        # mask_onlyGC = np.where((mask_onlyGC == 2) | (mask_onlyGC == 0), 0, 1).astype('uint8')
+        # img = image * mask_onlyGC[:, :, np.newaxis]
+        # display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # # self._display_image(img)
+        # # # changes:END
+        #
+        # bgdModel = np.zeros((1, 65), np.float64)
+        # fgdModel = np.zeros((1, 65), np.float64)
+        # mask, bgdModel, fgdModel = cv2.grabCut(image, mask, None, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_MASK)
+        # mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
+        # img = image * mask[:, :, np.newaxis]
+        # display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        # # self._display_image(img)
+
+        gc = GC_executor()
+        img = gc.grab_cut_with_patch(np.copy(image), np.copy(heat_map))
+        img_gc_only = gc.grab_cut_without_patch(np.copy(image))
         display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # self._display_image(img)
-        # # changes:END
+        display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
-        bgdModel = np.zeros((1, 65), np.float64)
-        fgdModel = np.zeros((1, 65), np.float64)
-        mask, bgdModel, fgdModel = cv2.grabCut(image, mask, None, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_MASK)
-        mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-        img = image * mask[:, :, np.newaxis]
-        display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # self._display_image(img)
-
-        self._display_images(display_images)
+        # self._display_images(display_images)
+        self._save_images(display_images)
         print 'Output Shape: ', heat_map.shape
 
 if __name__ == '__main__':
-    np.set_printoptions(threshold='nan')
+    np.set_printoptions(threshold='nan', linewidth=999)
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001568.jpg'
+    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001568.jpg'
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001423.jpg' # Person centerstage
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001416.jpg' # The good goats
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001397.jpg' # The best image
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001311.jpg' # Cyclists
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001289.jpg' # Bird
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/2007_000925.jpg'
-
     sg = SegmentGenerator(dest_path)
-    sg.segment(image_path)
-    np.set_printoptions(threshold='nan', linewidth=999)
+    # sg.segment(image_path)
+
+    sg.segment('/home/joseph/Hyd/IMG_1913.jpg')
+    sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
+    sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
+    sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
