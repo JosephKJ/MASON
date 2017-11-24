@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lib.map import HeatMap
 from lib.gc_executor import GC_executor
+from random import randint
 
 class SegmentGenerator:
     def __init__(self, destination_folder, img_file_extension='jpg'):
@@ -136,7 +137,7 @@ class SegmentGenerator:
         display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
         # self._display_images(display_images)
-        self._save_images(display_images)
+        self._save_images(display_images, os.path.join(self.dest_path, str(randint(100, 999))+'.png'))
         print 'Output Shape: ', heat_map.shape
 
 if __name__ == '__main__':
