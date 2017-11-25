@@ -92,7 +92,7 @@ class SegmentGenerator:
 
         # self._display_image(heat_map)
         # print heat_map
-        objectness_heatmap = cv2.applyColorMap(np.uint8(-heat_map), cv2.COLORMAP_JET)
+        objectness_heatmap = cv2.applyColorMap(np.uint8(heat_map), cv2.COLORMAP_JET)
         display_images.append(cv2.cvtColor(objectness_heatmap, cv2.COLOR_BGR2RGB))
         # self._display_image(objectness_heatmap)
 
@@ -170,7 +170,8 @@ if __name__ == '__main__':
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000452.jpg'
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_004143.jpg' # bird
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_004856.jpg' # The winner cat
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001423.jpg' # Person centerstage
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001416.jpg' # The good goats
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001397.jpg' # The best image
