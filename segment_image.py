@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lib.map import HeatMap
 from lib.gc_executor import GC_executor
-from random import randint
+import scipy
+from mpl_toolkits.mplot3d import Axes3D
 
 class SegmentGenerator:
     def __init__(self, destination_folder, img_file_extension='jpg'):
@@ -50,6 +51,28 @@ class SegmentGenerator:
             frame.axes.get_yaxis().set_ticks([])
             plt.imshow(image)
         plt.savefig(name, bbox_inches='tight')
+
+    def _draw_contour(self, im):
+        imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(imgray, 127, 255, 0)
+        image, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cnt = contours[4]
+        img = cv2.drawContours(im, [cnt], -1, (0, 255, 0), 3)
+        self._display_image(img)
+
+    def get_surface_plot(self, heat_map):
+        # downscaling has a "smoothing" effect
+        heat_map = scipy.misc.imresize(heat_map, 0.50, interp='cubic')
+
+        # create the x and y coordinate arrays (here we just use pixel indices)
+        xx, yy = np.mgrid[0:heat_map.shape[0], 0:heat_map.shape[1]]
+
+        # create the figure
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        # ax = fig.gca(projection='3d')
+        ax.plot_surface(xx, yy, heat_map, rstride=1, cstride=1, cmap=plt.cm.jet, linewidth=0)
+        plt.show()
 
     def segment(self, img_path):
 
@@ -136,8 +159,10 @@ class SegmentGenerator:
         display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
-        # self._display_images(display_images)
-        self._save_images(display_images, os.path.join(self.dest_path, str(randint(100, 999))+'.png'))
+        self.get_surface_plot(heat_map)
+        self._display_images(display_images)
+        # self._save_images(display_images, os.path.join(self.dest_path, str(randint(100, 999))+'.png'))
+        # self._draw_contour(img)
         print 'Output Shape: ', heat_map.shape
 
 if __name__ == '__main__':
@@ -145,7 +170,7 @@ if __name__ == '__main__':
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001568.jpg'
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000452.jpg'
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001423.jpg' # Person centerstage
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001416.jpg' # The good goats
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001397.jpg' # The best image
@@ -153,9 +178,12 @@ if __name__ == '__main__':
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001289.jpg' # Bird
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/2007_000925.jpg'
     sg = SegmentGenerator(dest_path)
-    # sg.segment(image_path)
+    sg.segment(image_path)
 
-    sg.segment('/home/joseph/Hyd/IMG_1913.jpg')
-    sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
-    sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
-    sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_1913.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_2096.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_2198.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_2097.jpg')

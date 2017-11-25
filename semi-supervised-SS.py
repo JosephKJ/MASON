@@ -157,8 +157,8 @@ class Enhancer:
         # self._display_images(patches)
         # self._display_images(heatmaps)
         # self._display_images(gc_without_objectness)
-        # self._display_images(gc_results)
-        self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
+        self._display_images(gc_results)
+        # self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
         # self._display_image(combined_heat_map)
 
 
@@ -172,16 +172,16 @@ if __name__ == '__main__':
 
     e = Enhancer(img_db_path, annotation_path, dest_annotation_path, actual_segmentation_annotation_path)
 
-    total_length = len(os.listdir(actual_segmentation_annotation_path))
-    for i, annotation_file in enumerate(os.listdir(actual_segmentation_annotation_path)):
-        if os.path.isfile(os.path.join(actual_segmentation_annotation_path, annotation_file)):
-            image = annotation_file.split('.')[0]
-            print 'Processing ', image, ' (', i, ' of ', total_length, ')'
-            e.enhance(image)
+    # total_length = len(os.listdir(actual_segmentation_annotation_path))
+    # for i, annotation_file in enumerate(os.listdir(actual_segmentation_annotation_path)):
+    #     if os.path.isfile(os.path.join(actual_segmentation_annotation_path, annotation_file)):
+    #         image = annotation_file.split('.')[0]
+    #         print 'Processing ', image, ' (', i, ' of ', total_length, ')'
+    #         e.enhance(image)
 
-    # image_names = ["2007_001423", "2007_001397", "2007_001289"]
-    # for image in image_names:
-    #     e.enhance(image)
-    #     print 'Processing ', image
+    image_names = ["2007_001568"]
+    for image in image_names:
+        e.enhance(image)
+        print 'Processing ', image
 
     print('Done.')
