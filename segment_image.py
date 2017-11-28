@@ -160,6 +160,7 @@ class SegmentGenerator:
         display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
         self.get_surface_plot(heat_map)
+        # self._display_image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         self._display_images(display_images)
         # self._save_images(display_images, os.path.join(self.dest_path, str(randint(100, 999))+'.png'))
         # self._draw_contour(img)
@@ -186,5 +187,5 @@ if __name__ == '__main__':
     # sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_2096.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_2198.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_2097.jpg')
+    # sg.segment('/home/joseph/Hyd/IMG_0001.PNG')
+    # sg.segment('/home/joseph/Hyd/IMG_2141.JPG')
