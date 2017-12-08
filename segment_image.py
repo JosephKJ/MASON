@@ -180,12 +180,12 @@ if __name__ == '__main__':
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001289.jpg' # Bird
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/2007_000925.jpg'
     sg = SegmentGenerator(dest_path)
-    sg.segment(image_path)
+    # sg.segment(image_path)
 
     # sg.segment('/home/joseph/Hyd/IMG_1913.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_2096.jpg')
+    sg.segment('/home/joseph/Hyd/IMG_2097.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_0001.PNG')
     # sg.segment('/home/joseph/Hyd/IMG_2141.JPG')

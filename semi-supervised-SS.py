@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 from lib.map import HeatMap
+from sklearn.metrics import jaccard_similarity_score
 import scipy
 
 class GC_executor:
@@ -83,7 +84,7 @@ class Enhancer:
 
     def _display_images(self, images):
         plt.figure(figsize=(20, 10))
-        columns = 7
+        columns = 5
         for i, image in enumerate(images):
             plt.subplot(len(images) / columns + 1, columns, i + 1)
             frame = plt.gca()
@@ -94,7 +95,7 @@ class Enhancer:
 
     def _save_images(self, images, name):
         plt.figure(figsize=(20, 10))
-        columns = 7
+        columns = 5
         for i, image in enumerate(images):
             plt.subplot(len(images) / columns + 1, columns, i + 1)
             frame = plt.gca()
@@ -184,6 +185,7 @@ class Enhancer:
         patches = []
         heatmaps = []
         gc_results = []
+        ground_truth_boxes = np.zeros((image.shape[:2]))
         for i, annotation in enumerate(root.findall('./object')):
             xmin = int(annotation.find('./bndbox/xmin').text)
             ymin = int(annotation.find('./bndbox/ymin').text)
@@ -200,37 +202,55 @@ class Enhancer:
             objectness_heatmap = cv2.applyColorMap(np.uint8(-heat_map), cv2.COLORMAP_JET)
             heatmaps.append(heat_map)
             combined_heat_map[ymin:ymax, xmin:xmax] = heat_map
+            ground_truth_boxes [ymin:ymax, xmin:xmax] = np.ones_like(heat_map)
 
         # GrabCut
         img = gc.grab_cut_with_patch(np.copy(image), np.copy(combined_heat_map))
         img_gc_only = gc.grab_cut_without_patch(np.copy(image))
 
-        # Unsupervised
+        #
+        # # Unsupervised
         heat_map = self.heatmap_obj.get_map(image)
         heat_map_unsupervised = heat_map.data * ~heat_map.mask
-        img_unsupervised = gc.grab_cut_with_patch(np.copy(image), np.copy(combined_heat_map))
+        img_unsupervised = gc.grab_cut_with_patch(np.copy(image), np.copy(heat_map_unsupervised))
 
 
         gc_results.append(image)
-        gc_results.append(heat_map_unsupervised)
+        # gc_results.append(heat_map_unsupervised)
+        gc_results.append(cv2.cvtColor(cv2.applyColorMap(np.uint8(heat_map_unsupervised), cv2.COLORMAP_JET), cv2.COLOR_BGR2RGB))
         gc_results.append(img_unsupervised)
-        # gc_results.append(cv2.applyColorMap(np.uint8(-combined_heat_map), cv2.COLORMAP_JET))
-        gc_results.append(combined_heat_map)
-        gc_results.append(img)
+        # gc_results.append(cv2.cvtColor(cv2.applyColorMap(np.uint8(combined_heat_map), cv2.COLORMAP_JET), cv2.COLOR_BGR2RGB))
+        # # gc_results.append(combined_heat_map)
+        # gc_results.append(img)
         gc_results.append(img_gc_only)
         annotation_image = cv2.imread(os.path.join(self.actual_segmentation_annotation_path, file_name + '.png'), cv2.IMREAD_COLOR)
         gc_results.append(annotation_image)
+        #
+        # # Getting the GT to calculate iou
+        # image_path = os.path.join(self.actual_segmentation_annotation_path, file_name + '.png')
+        # annotation_gt_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        # print np.array(annotation_gt_image).shape
+        # annotation_gt = annotation_gt_image[:,:,0]
+        # print np.array(annotation_gt).shape
+        # self._display_image(annotation_gt)
+        #
+        # heat_map_unsupervised[heat_map_unsupervised > 0] = 1
+        # img_true = np.array(annotation_gt).ravel()
+        # img_pred = np.array(heat_map_unsupervised).ravel()
+        # iou = jaccard_similarity_score(img_true, img_pred)
+        # return iou
 
-        # Visualize the output
-        self._display_images(gc_results)
-        # self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
+        # self._display_image(combined_heat_map)
+        # self._display_image(ground_truth_boxes)
+        # self._display_images(gc_results)
+        self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
 
     img_db_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/')
     annotation_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/Annotations/')
-    dest_annotation_path = os.path.join('/home/joseph/segmentation_results')
+    dest_annotation_path = os.path.join('/home/joseph/paper_results_unsupervised/bad_examples')
     actual_segmentation_annotation_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/')
 
     e = Enhancer(img_db_path, annotation_path, dest_annotation_path, actual_segmentation_annotation_path)
@@ -242,9 +262,33 @@ if __name__ == '__main__':
     #         print 'Processing ', image, ' (', i, ' of ', total_length, ')'
     #         e.enhance(image)
 
-    image_names = ["2007_001568"]
-    for image in image_names:
+    image_names = ["2007_000042", "2007_000363", "2007_000676",
+                   "2007_000799", "2007_001073", "2007_001239",
+                   "2007_001397", "2007_001416", "2007_002088",
+                   "2007_003910", "2007_004143", "2007_004856",
+                   "2007_005130", "2007_008051", "2007_009082",
+                   "2008_002835", "2008_002904", "2008_003379",
+                   "2008_007239", "2009_000664", "2009_005137",
+                   "2010_001995"]
+
+    image_names = ["2007_002488", "2007_002823", "2007_003876",
+                   "2007_005304", "2007_006647", "2008_001208",
+                   "2009_002425"]
+
+    iou = 0
+    # total_length = len(os.listdir(actual_segmentation_annotation_path))
+    # for i, annotation_file in enumerate(os.listdir(actual_segmentation_annotation_path)):
+    #     if os.path.isfile(os.path.join(actual_segmentation_annotation_path, annotation_file)):
+    #         image = annotation_file.split('.')[0]
+    #         iou += e.enhance_combined(image)
+    #         print 'Processing ', image, ' (', i, ' of ', total_length, ')'
+
+    # for i, image in enumerate(image_names):
+    #     iou += e.enhance_combined(image)
+    #     print 'Processing ', image, 'i: ', i
+
+    for i, image in enumerate(image_names):
         e.enhance_combined(image)
-        print 'Processing ', image
+        print 'Processing ', image, 'i: ', i
 
     print('Done.')
