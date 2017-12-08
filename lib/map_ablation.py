@@ -65,7 +65,7 @@ class HeatMap:
         np.set_printoptions(threshold='nan')
         feature_sum = (255 * (feature_sum - np.min(feature_sum)) / np.ptp(feature_sum)).astype(int)
         # feature_sum = (feature_sum - np.min(feature_sum)) / np.ptp(feature_sum)
-        threshold = feature_sum.mean() + 20
+        threshold = feature_sum.mean() - 20
         # threshold = 0
         feature_sum = np.ma.masked_where(feature_sum <= threshold, feature_sum)
 
@@ -88,17 +88,26 @@ class HeatMap:
         plt.imshow(image)
         plt.show()
 
+    def save_image(self, image, name):
+        image = cv2.cvtColor(cv2.applyColorMap(np.uint8(image), cv2.COLORMAP_JET), cv2.COLOR_BGR2RGB)
+        frame1 = plt.gca()
+        frame1.axes.get_xaxis().set_ticks([])
+        frame1.axes.get_yaxis().set_ticks([])
+        plt.imshow(image)
+        plt.savefig(name, bbox_inches='tight')
+
 
 if __name__ == '__main__':
     print('Inside Main.')
 
-    hm = HeatMap()
+    hm = HeatMap(arch='CaffeNet')
 
     image_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2010_004861.jpg')
     img = cv2.imread(image_path, cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     hMap = hm.get_map(img, verbose=False)
-    hm.display_image(hMap)
+    # hm.display_image(hMap)
+    hm.save_image(hMap, '/home/joseph/ablation/CaffeNet.png')
 
     # for i in range(1, 4):
     #     hMap = hm.get_map(img, verbose=True, layer_name='res3b'+str(i))
