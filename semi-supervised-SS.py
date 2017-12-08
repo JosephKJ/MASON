@@ -242,8 +242,8 @@ class Enhancer:
 
         # self._display_image(combined_heat_map)
         # self._display_image(ground_truth_boxes)
-        # self._display_images(gc_results)
-        self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
+        self._display_images(gc_results)
+        # self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
@@ -274,6 +274,8 @@ if __name__ == '__main__':
     image_names = ["2007_002488", "2007_002823", "2007_003876",
                    "2007_005304", "2007_006647", "2008_001208",
                    "2009_002425"]
+
+    image_names = ['2010_004861']
 
     iou = 0
     # total_length = len(os.listdir(actual_segmentation_annotation_path))
