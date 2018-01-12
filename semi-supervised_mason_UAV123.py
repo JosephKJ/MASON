@@ -244,6 +244,12 @@ class Enhancer:
         self._display_images(gc_results)
         # self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
 
+    def segment_UAV123(self, annotation_index, only_gc=True):
+        annotation_file = '/home/joseph/Dataset/UAV123/anno/UAV123/bike1.txt'
+        annotations = np.genfromtxt(annotation_file, delimiter=',', dtype=np.int)
+        print annotations.shape
+
+
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
 
@@ -288,8 +294,10 @@ if __name__ == '__main__':
     #     iou += e.enhance_combined(image)
     #     print 'Processing ', image, 'i: ', i
 
-    for i, image in enumerate(image_names):
-        e.enhance_combined(image)
-        print 'Processing ', image, 'i: ', i
+    # for i, image in enumerate(image_names):
+    #     e.enhance_combined(image)
+    #     print 'Processing ', image, 'i: ', i
+
+    e.segment_UAV123()
 
     print('Done.')
