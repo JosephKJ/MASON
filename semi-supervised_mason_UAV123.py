@@ -28,7 +28,7 @@ class GC_executor:
         self.fgdModel = np.zeros((1, 65), np.float64)
 
         mean = np.mean(heat_map[heat_map != 0])
-        heat_map_high_prob = np.where((heat_map > mean), 1, 0).astype('uint8')
+        heat_map_high_prob = np.where((heat_map > mean+2), 1, 0).astype('uint8')
         heat_map_low_prob = np.where((heat_map > 0), 3, 0).astype('uint8')
         mask = heat_map_high_prob + heat_map_low_prob
         mask[mask == 4] = 1
@@ -51,7 +51,7 @@ class GC_executor:
 
         mask_onlyGC = np.where((mask_onlyGC == 2) | (mask_onlyGC == 0), 0, 1).astype('uint8')
         img = patch * mask_onlyGC[:, :, np.newaxis]
-        return img
+        return img, mask_onlyGC
 
 
 class Enhancer:
@@ -244,11 +244,61 @@ class Enhancer:
         self._display_images(gc_results)
         # self._save_images(gc_results, os.path.join(self.dest_annotation_path, file_name+'.png'))
 
-    def segment_UAV123(self, annotation_index, only_gc=True):
-        annotation_file = '/home/joseph/Dataset/UAV123/anno/UAV123/bike1.txt'
-        annotations = np.genfromtxt(annotation_file, delimiter=',', dtype=np.int)
-        print annotations.shape
+    def save_image(self, image, path):
+        cv2.imwrite(path, cv2.cvtColor(image, cv2.COLOR_RGB2BGR))
 
+    def segment_UAV123(self, annotation_index, file_name, only_gc=True):
+        gc = GC_executor()
+
+        image_base_path = '/home/joseph/Dataset/UAV123/data_seq/UAV123/car4'
+        output_base_path = '/home/joseph/drdo/uav123/car4'
+        image_path = os.path.join(image_base_path, file_name)
+        output_path = os.path.join(output_base_path, file_name)
+
+        annotation_file = '/home/joseph/Dataset/UAV123/anno/UAV123/car4.txt'
+        annotations = np.genfromtxt(annotation_file, delimiter=',', dtype=np.int)
+
+        # Reading image
+        image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # Reading annotation
+        annotation = annotations[annotation_index]
+
+        padding = 0
+        x1, y1 = int(annotation[0]) - padding, int(annotation[1]) - padding
+        x2, y2 = int(annotation[0]) + int(annotation[2]) + padding, int(annotation[1]) + int(annotation[3]) + padding
+
+        patch = image[y1:y2, x1:x2]
+        # self._display_image(patch)
+
+        # Generating the heatmap for the patch
+        heat_map = self.heatmap_obj.get_map(patch)
+        heat_map = heat_map.data * ~heat_map.mask
+
+        img = gc.grab_cut_with_patch(np.copy(patch), np.copy(heat_map))
+        img_gc_only, binary_map = gc.grab_cut_without_patch(np.copy(patch))
+        negative_binary_map = 1 - binary_map
+        # self._display_image(img)
+        # self._display_image(img_gc_only)
+
+        # Calculating the background
+        three_channel_map = np.stack((negative_binary_map, negative_binary_map, negative_binary_map), axis=2)
+        background = (patch * three_channel_map).astype(np.uint8)
+
+        # Segmentation Foreground
+        r, g, b = (255, 83, 26)
+        foreground = np.stack((binary_map * r, binary_map * g, binary_map * b), axis=2).astype(np.uint8)
+
+        image[y1:y2, x1:x2] = (background + foreground)
+
+        # Drawing the rectangle
+        bgr_img = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        cv2.rectangle(bgr_img, (x1, y1), (x2, y2), (255, 83, 26)[::-1], 2)
+        image = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
+
+        # self._display_image(image)
+        self.save_image(image, output_path)
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan')
@@ -298,6 +348,11 @@ if __name__ == '__main__':
     #     e.enhance_combined(image)
     #     print 'Processing ', image, 'i: ', i
 
-    e.segment_UAV123()
+    img_path = '/home/joseph/Dataset/UAV123/data_seq/UAV123/car4'
+    for i, file in enumerate(sorted(os.listdir(img_path))):
+        print 'Processing ', file, 'i: ', i
+        e.segment_UAV123(i+1, file)
+        if i==2:
+            break
 
     print('Done.')
