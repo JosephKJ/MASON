@@ -23,6 +23,9 @@ class HeatMap:
         elif arch == 'VGG16':
             model_def = os.path.join(os.path.dirname(__file__), '../model/VGG_ILSVRC_16_layers_conv_only.prototxt')
             model_weights = os.path.join(os.path.dirname(__file__), '../model/VGG_ILSVRC_16_layers.caffemodel')
+        elif arch == 'VGG19':
+            model_def = os.path.join(os.path.dirname(__file__), '../model/VGG_ILSVRC_19_layers_conv_only.prototxt')
+            model_weights = os.path.join(os.path.dirname(__file__), '../model/VGG_ILSVRC_19_layers.caffemodel')
         elif arch == 'ResNet-50':
             model_def = os.path.join(os.path.dirname(__file__), '../model/ResNet-50-deploy.prototxt')
             model_weights = os.path.join(os.path.dirname(__file__), '../model/ResNet-50-model.caffemodel')
@@ -54,7 +57,9 @@ class HeatMap:
         if self.arch == 'CaffeNet':
             feat = net.blobs['conv5'].data[0]
         elif self.arch == 'VGG16':
-            feat = net.blobs['conv5_3'].data[0]
+            feat = net.blobs['conv3_2'].data[0]
+        elif self.arch == 'VGG19':
+            feat = net.blobs['conv5_4'].data[0]
         elif self.arch == 'ResNet-50':
             feat = net.blobs['res3a'].data[0]
         elif self.arch == 'ResNet-101':
@@ -65,7 +70,7 @@ class HeatMap:
         np.set_printoptions(threshold='nan')
         feature_sum = (255 * (feature_sum - np.min(feature_sum)) / np.ptp(feature_sum)).astype(int)
         # feature_sum = (feature_sum - np.min(feature_sum)) / np.ptp(feature_sum)
-        threshold = feature_sum.mean() - 20
+        threshold = feature_sum.mean() + 20
         # threshold = 0
         feature_sum = np.ma.masked_where(feature_sum <= threshold, feature_sum)
 
@@ -100,14 +105,15 @@ class HeatMap:
 if __name__ == '__main__':
     print('Inside Main.')
 
-    hm = HeatMap(arch='CaffeNet')
+    hm = HeatMap()
 
+    # image_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_008051.jpg')
     image_path = os.path.join('/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2010_004861.jpg')
     img = cv2.imread(image_path, cv2.IMREAD_COLOR)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     hMap = hm.get_map(img, verbose=False)
     # hm.display_image(hMap)
-    hm.save_image(hMap, '/home/joseph/ablation/CaffeNet.png')
+    hm.save_image(hMap, '/home/joseph/ablation/conv_3_2.png')
 
     # for i in range(1, 4):
     #     hMap = hm.get_map(img, verbose=True, layer_name='res3b'+str(i))
