@@ -60,7 +60,7 @@ class SegmentGenerator:
         img = cv2.drawContours(im, [cnt], -1, (0, 255, 0), 3)
         self._display_image(img)
 
-    def get_surface_plot(self, heat_map):
+    def _get_surface_plot(self, heat_map):
         # downscaling has a "smoothing" effect
         heat_map = scipy.misc.imresize(heat_map, 0.50, interp='cubic')
 
@@ -89,82 +89,19 @@ class SegmentGenerator:
         # Get the objectness
         heat_map = self.heatmap_obj.get_map(image)
         heat_map = heat_map.data * ~heat_map.mask
-
-        # self._display_image(heat_map)
-        # print heat_map
         objectness_heatmap = cv2.applyColorMap(np.uint8(heat_map), cv2.COLORMAP_JET)
         display_images.append(cv2.cvtColor(objectness_heatmap, cv2.COLOR_BGR2RGB))
-        # self._display_image(objectness_heatmap)
-
-
-        # Remove the border in the detections
-        # border = 2
-        # temp = np.zeros_like(heat_map)
-        # temp[border:-border, border:-border] = heat_map[border:-border, border:-border]
-        # heat_map = temp
-        #
-        # # Binary Map
-        # heat_map[heat_map > 0] = 1
-        # map_h, map_w = heat_map.shape
-        #
-        # # Flood filling it
-        # im_floodfill = heat_map.copy()
-        # h, w = im_floodfill.shape[:2]
-        # mask = np.zeros((h + 2, w + 2), np.uint8)
-        # cv2.floodFill(im_floodfill, mask, (0, 0), 255)
-        # im_floodfill_inv = cv2.bitwise_not(im_floodfill)
-        # heat_map = heat_map | im_floodfill_inv
-
-        # # Rejecting again if the number of disconnected components are > 3
-        # im2, contours, hierarchy = cv2.findContours(heat_map, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        #
-        # boundingBoxes = [cv2.boundingRect(c) for c in contours]
-        # contour_area = [cv2.contourArea(c) for c in contours]
-        # index = np.argmax(contour_area)
-        # x, y, w, h = boundingBoxes[index]
-        #
-        # xmin_tight = int(xmin + x - padding) if int(x - padding) > 0 else xmin
-        # ymin_tight = int(ymin + y - padding) if int(y - padding) > 0 else ymin
-        # xmax_tight = int(xmin + x + w + padding) if int(x + w + padding) < map_w else xmin + map_w
-        # ymax_tight = int(ymin + y + h + padding) if int(y + h + padding) < map_h else ymin + map_h
-
-        # self._display_images(patches)
-        # mask = heat_map
-        # mask[mask == 255] = 3
-        # mask[mask == 0] = 2
-
-        # # # changes: START
-        # bgdModel = np.zeros((1, 65), np.float64)
-        # fgdModel = np.zeros((1, 65), np.float64)
-        # mask_onlyGC = np.zeros(image.shape[:2], np.uint8)
-        # rect = (0, 0, image.shape[1]-1, image.shape[0]-1)
-        # cv2.grabCut(image, mask_onlyGC, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
-        # mask_onlyGC = np.where((mask_onlyGC == 2) | (mask_onlyGC == 0), 0, 1).astype('uint8')
-        # img = image * mask_onlyGC[:, :, np.newaxis]
-        # display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # # self._display_image(img)
-        # # # changes:END
-        #
-        # bgdModel = np.zeros((1, 65), np.float64)
-        # fgdModel = np.zeros((1, 65), np.float64)
-        # mask, bgdModel, fgdModel = cv2.grabCut(image, mask, None, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_MASK)
-        # mask = np.where((mask == 2) | (mask == 0), 0, 1).astype('uint8')
-        # img = image * mask[:, :, np.newaxis]
-        # display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-        # # self._display_image(img)
 
         gc = GC_executor()
+
+        # Doing grabcut using heat_map
         img = gc.grab_cut_with_patch(np.copy(image), np.copy(heat_map))
+        # Doing grabcut without using heat_map
         img_gc_only = gc.grab_cut_without_patch(np.copy(image))
         display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
-        self.get_surface_plot(heat_map)
-        # self._display_image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         self._display_images(display_images)
-        # self._save_images(display_images, os.path.join(self.dest_path, str(randint(100, 999))+'.png'))
-        # self._draw_contour(img)
-        print 'Output Shape: ', heat_map.shape
 
 if __name__ == '__main__':
     np.set_printoptions(threshold='nan', linewidth=999)
