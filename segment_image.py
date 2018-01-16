@@ -119,7 +119,7 @@ if __name__ == '__main__':
     # sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
-    sg.segment('/home/joseph/Hyd/IMG_2097.jpg')
+    sg.segment(image_path)
     # sg.segment('/home/joseph/Hyd/IMG_0001.PNG')
     # sg.segment('/home/joseph/Hyd/IMG_2141.JPG')
     print 'Done.'
