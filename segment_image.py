@@ -101,26 +101,12 @@ class SegmentGenerator:
         self._display_images(display_images)
 
 if __name__ == '__main__':
-    np.set_printoptions(threshold='nan', linewidth=999)
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_004143.jpg' # bird
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_004856.jpg' # The winner cat
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001423.jpg' # Person centerstage
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001416.jpg' # The good goats
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000363.jpg' # The best image
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001311.jpg' # Cyclists
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001289.jpg' # Bird
-    # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/2007_000925.jpg'
-    sg = SegmentGenerator(dest_path)
-    # sg.segment(image_path)
+    image_path = './demo/2007_000363.jpg'
 
-    # sg.segment('/home/joseph/Hyd/IMG_1913.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_1916.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_1959.jpg')
-    # sg.segment('/home/joseph/Hyd/IMG_1962.jpg')
+    sg = SegmentGenerator(dest_path)
     sg.segment(image_path)
-    # sg.segment('/home/joseph/Hyd/IMG_0001.PNG')
-    # sg.segment('/home/joseph/Hyd/IMG_2141.JPG')
+
     print 'Done.'
