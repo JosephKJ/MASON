@@ -19,7 +19,9 @@ Unsupervised Segmentation of Images
   git reset --hard 1a2be8e
   ```
   
-3. Get the ImageNet pretrained VGG-16 network(caffemodel only) and place it in `./model` folder. 
+3. Setup CAFFE
+  
+4. Get the ImageNet pretrained VGG-16 network(caffemodel only) and place it in `./model` folder. 
 
 caffemodel_url: http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel
 
