@@ -97,6 +97,7 @@ class SegmentGenerator:
         display_images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         display_images.append(cv2.cvtColor(img_gc_only, cv2.COLOR_BGR2RGB))
 
+        print 'Displaying image...'
         self._display_images(display_images)
 
 if __name__ == '__main__':
