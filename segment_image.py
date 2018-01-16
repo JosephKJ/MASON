@@ -78,11 +78,7 @@ class SegmentGenerator:
 
         # Read the image
         image = cv2.imread(img_path, cv2.IMREAD_COLOR)
-        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        xmin = 0
-        ymin = 0
-        padding = 0
-        print 'Input Shape: ', image.shape
+
         display_images = []
         display_images.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
@@ -126,3 +122,4 @@ if __name__ == '__main__':
     sg.segment('/home/joseph/Hyd/IMG_2097.jpg')
     # sg.segment('/home/joseph/Hyd/IMG_0001.PNG')
     # sg.segment('/home/joseph/Hyd/IMG_2141.JPG')
+    print 'Done.'
