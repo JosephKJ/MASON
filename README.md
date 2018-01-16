@@ -26,6 +26,7 @@ caffemodel_url: http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILS
 ## Demo
 
 You can run `python segment_image.py`. 
+
 This script will take the image located in `./data/demo/2007_000363.jpg`, computes the objectness heatmap, uses it with GrabCut and gets the result displayed on screen. (NB: This method doesnot require any bounding box annotation.)
 
 Output
