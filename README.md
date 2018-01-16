@@ -30,3 +30,4 @@ This script will take the image located in `./data/demo/2007_000363.jpg`, comput
 
 Output
 ![alt text](https://github.com/JosephKJ/Unsupervised-Segmentation/blob/master/data/demo/output.png)
+(Legend: Input text -- Objectness heat map -- Segmentation using MASON and GrabCut -- Segmentation using GrabCut alone)
