@@ -1,7 +1,7 @@
 # Unsupervised-Segmentation
 Unsupervised Segmentation of Images
 
-### Installation
+## Installation
 1. Clone this repository
   ```Shell
   git clone https://github.com/JosephKJ/Unsupervised-Segmentation
@@ -23,3 +23,10 @@ Unsupervised Segmentation of Images
 
 caffemodel_url: http://www.robots.ox.ac.uk/~vgg/software/very_deep/caffe/VGG_ILSVRC_16_layers.caffemodel
 
+## Demo
+
+You can run `python segment_image.py`. 
+This script will take the image located in `./data/demo/2007_000363.jpg`, computes the objectness heatmap, uses it with GrabCut and gets the result displayed on screen. (NB: This method doesnot require any bounding box annotation.)
+
+Output
+![alt text](https://github.com/JosephKJ/Unsupervised-Segmentation/blob/master/data/demo/output.png)
