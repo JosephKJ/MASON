@@ -214,7 +214,6 @@ class Enhancer:
         heat_map_unsupervised = heat_map.data * ~heat_map.mask
         img_unsupervised = gc.grab_cut_with_patch(np.copy(image), np.copy(heat_map_unsupervised))
 
-
         gc_results.append(image)
         # gc_results.append(heat_map_unsupervised)
         gc_results.append(cv2.cvtColor(cv2.applyColorMap(np.uint8(heat_map_unsupervised), cv2.COLORMAP_JET), cv2.COLOR_BGR2RGB))
@@ -225,20 +224,6 @@ class Enhancer:
         gc_results.append(img_gc_only)
         annotation_image = cv2.imread(os.path.join(self.actual_segmentation_annotation_path, file_name + '.png'), cv2.IMREAD_COLOR)
         gc_results.append(annotation_image)
-        #
-        # # Getting the GT to calculate iou
-        # image_path = os.path.join(self.actual_segmentation_annotation_path, file_name + '.png')
-        # annotation_gt_image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-        # print np.array(annotation_gt_image).shape
-        # annotation_gt = annotation_gt_image[:,:,0]
-        # print np.array(annotation_gt).shape
-        # self._display_image(annotation_gt)
-        #
-        # heat_map_unsupervised[heat_map_unsupervised > 0] = 1
-        # img_true = np.array(annotation_gt).ravel()
-        # img_pred = np.array(heat_map_unsupervised).ravel()
-        # iou = jaccard_similarity_score(img_true, img_pred)
-        # return iou
 
         # self._display_image(combined_heat_map)
         # self._display_image(ground_truth_boxes)
@@ -275,19 +260,6 @@ if __name__ == '__main__':
                    "2007_005304", "2007_006647", "2008_001208",
                    "2009_002425"]
 
-    image_names = ['2010_004861']
-
-    iou = 0
-    # total_length = len(os.listdir(actual_segmentation_annotation_path))
-    # for i, annotation_file in enumerate(os.listdir(actual_segmentation_annotation_path)):
-    #     if os.path.isfile(os.path.join(actual_segmentation_annotation_path, annotation_file)):
-    #         image = annotation_file.split('.')[0]
-    #         iou += e.enhance_combined(image)
-    #         print 'Processing ', image, ' (', i, ' of ', total_length, ')'
-
-    # for i, image in enumerate(image_names):
-    #     iou += e.enhance_combined(image)
-    #     print 'Processing ', image, 'i: ', i
 
     for i, image in enumerate(image_names):
         e.enhance_combined(image)
