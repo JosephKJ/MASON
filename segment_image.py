@@ -104,7 +104,7 @@ if __name__ == '__main__':
     img_db_path = os.path.join('./data/images')
     dest_path = os.path.join('./data/segmentations')
 
-    image_path = './demo/2007_000363.jpg'
+    image_path = './data/demo/2007_000363.jpg'
 
     sg = SegmentGenerator(dest_path)
     sg.segment(image_path)
