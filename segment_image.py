@@ -109,7 +109,7 @@ if __name__ == '__main__':
     image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_004856.jpg' # The winner cat
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001423.jpg' # Person centerstage
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001416.jpg' # The good goats
-    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001397.jpg' # The best image
+    image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_000363.jpg' # The best image
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001311.jpg' # Cyclists
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/JPEGImages/2007_001289.jpg' # Bird
     # image_path = '/home/joseph/Dataset/voc_2012/VOCdevkit/VOC2012/SegmentationClass/2007_000925.jpg'
