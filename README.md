@@ -31,6 +31,6 @@ This script will take the image located in `./data/demo/2007_000363.jpg`, comput
 
 Output
 ![alt text](https://github.com/JosephKJ/Unsupervised-Segmentation/blob/master/data/demo/output.png)
-(Legend: Input text -- Objectness heat map -- Segmentation using MASON and GrabCut -- Segmentation using GrabCut alone)
+(Legend: Input image -- Objectness heat map -- Segmentation using MASON and GrabCut -- Segmentation using GrabCut alone)
 
 `semi-supervised-SS.py` expects bounding box information from a dataset. The code can work out of the box with Pascal VOC dataset. 
