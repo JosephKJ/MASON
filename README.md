@@ -1,4 +1,4 @@
-# Unsupervised-Segmentation
+# Unsupervised Segmentation using MASON
 Unsupervised Segmentation of Images
 
 ## Installation
