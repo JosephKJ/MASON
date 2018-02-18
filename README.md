@@ -4,7 +4,7 @@ Unsupervised Segmentation of Images
 ## Installation
 1. Clone this repository
   ```Shell
-  git clone https://github.com/JosephKJ/Unsupervised-Segmentation
+  git clone https://github.com/JosephKJ/MASON
   ```
   Let's call the directory as `ROOT`
 
